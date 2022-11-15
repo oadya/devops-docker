@@ -1,0 +1,94 @@
+Solution orhextration d'une application containairisé
+
+Primitive d'un swarm 
+
+Node = machine membre du cluster(workers et managers)
+Service = specification des container d'une application
+secret = données sensibles
+Config = configuration de l'application
+Stack = groupe de service
+Routing Mesh
+
+
+docker swarm --help
+
+Node (Worker et Manager)
+Etat Node :
+ative : le scheduler peut assigner des taches à ce node
+pause : n'accepte aucune nouvelle tache
+Drain : stopppe le tache en cours et seront lancée sur d'autrs nodes
+
+docker node --help
+
+Creation ou initialisation d'un swarm
+docker swarm init --advertise-addr 192.168.99.100 (depuis node 1)
+
+Ajouter des membres/worker au swarm 
+docker swarm join --tocken xxxx
+
+lister nodes / membre du swarm
+docker node ls
+
+ajouter un manager au swarm 
+docker swarm join-tocken manager ( à lancer depuis node 1)
+
+promote et demote
+docker node demote node1 
+docker node promote node2 
+
+
+Node Availability
+------------------
+docker node update --availability pause/drain/active node2 
+
+
+Node labels
+------------------
+docker node update --label-add Memcached=true node1
+
+docker node inspect -f '{{ json .Spec.Labels }}' node1 | jq
+
+
+Service:
+---------
+Définit la manière dans une application doit etre exécuté
+
+Fonctionne en mode replicated (defaut, on peut spécifier le nombre de réplicat) ou global(1 instance du service sur chaque node du swarm)
+
+Pour pourvoir etre accéder depuis l'extérieur un service peut publier un/plusieur port
+
+Routing Mesh : si un port est publier il sera disponible depuis chaque node du swarm
+
+Opton d'un service
+-----------------
+image utilisée
+mode de deploiment
+ports exposé
+Secret/ config 
+stratégie de rédémarrage
+contraintes de déploiment
+Configuration des mises à jour
+limitation des ressources 
+Health check
+
+
+Service et replica
+------------------
+on défini le nombre de tache(task) à lancer, et chaque tâche est déployé sur un node du swarm et exécute un container basée sur une image définie dans le service
+
+api service :
+docker service --help
+
+creation service :
+docker service create --name www -p 8000:80 --replicas 3 nginx (à lancer sur un manager)
+
+lister les services disponibles:
+docker service ls
+
+lister les taches du service www: 
+docker service ps www
+
+modifier le nombre de replica
+docker service scale www=1
+
+

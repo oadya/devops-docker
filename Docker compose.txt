@@ -1,0 +1,19 @@
+Gérer des applications milti container
+
+Sevice => micro-service
+volumes
+Networks => isoler es groupe de service
+Secrets
+Config
+
+Commandes :
+
+up/down : creation  suppression de l'application
+start/stop  : démarrage / arrêt d'une application
+build : build des imaages des services
+pull : telechargement d'une image
+logs : visualisation des logs
+scale : modification du nombre de container our un service
+ps : lister les container de l'application
+
+docker-compose -f docker-compose-simple.yml up -d 

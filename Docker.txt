@@ -1,0 +1,157 @@
+Installer dockcer :
+docker version
+curl -sSL https://get.docker.com | sh
+
+copie de clé public:
+ssh-copy-id -i ~/.ssh/id_rsa.pub ubuntu@12.168.1.100
+
+CSNF : CLOUD NATIVE COMPUTING FOUNDATION 
+DEVOPS : le moment où on l'idée d'ne fonctionnalité et le cmoment où cette fonctionnalité est livrée en production
+
+# -ti : créé un terminal et se connecté à ce termnal
+
+#Lancer un container
+ 
+docker container run [OPTIONS] IMAGE [COMMAND] [ARG...]
+docker run -t -i ubuntu bash
+docker run -ti ubuntu bash
+docker run -ti --name=cont1 --hostname="host1" ubuntu 
+docker run -d -ti --name=cont1--hostname="host1" ubuntu 
+docker run -d -ti centos ping 127.0.0.1 
+docker run -d -P nginx (P : mapping de port)
+docker run -ti --name=contempo centos
+
+docker container run -d -p 8080:80 nginx:1.14-alpine 
+docker container run  -p 80:3000 redmine:3
+docker container run  ubuntu echo hello
+docker container run  ubuntu bash
+docker container run  -ti alpine
+docker container run  hello-world
+
+
+systemctl status docker 
+
+exit : arrêter/sortir un container
+curl http://0.0.0.0:32771
+
+#lister processus
+ps -aux 
+
+#Commande ls
+---------------
+docker container ls 
+docker container ls -a => retourne les container en cours et arrêt
+docker container ls -aq => retourne les id des container 
+
+#Visualisser les logs d'un container
+docker container logs -f ping (-f :suivi en temps réel)
+
+
+#Commande exec 
+exécuter une comande dans un container en cours d'exécution
+docker container exec -ti host1 sh
+ps aux
+
+# pour visualiser les sorties standard d'un container qui fonctionne en mode détaché
+docker container logs [ID CONTAINER / NON]
+
+#S'attacher
+docker attach [ID CONTAINER / NON]
+
+# Ctrl pq pour passer du mode attacher au mode détaché
+
+#Start et Stop des container
+----------------------------
+docker stop [ID CONTAINER / NON] : arrêt propre
+docker container stop $(docker container ls -q)
+docker start [ID CONTAINER / NON]
+docker kill [ID CONTAINER / NON]
+
+-f : forcer l'arrêt
+
+
+#Supprimer d'un container déjà stoppé
+-------------------------------------
+docker rm web03/id 
+docker container rm web03
+docker rm -f web03
+docker rm -$(docker ps -aq --filter status=exited)
+docker container rm$(docker container ls -aq)
+
+#lancer un processus en parallèle sur le container
+# exec ne doit pas être utilisé pour lancer notre application, elle sert à lancer des processus annexe, modification d'une configuration ou des outils de serveillance
+docker exec -ti host2 bash  
+
+#Les containers qui s'exécutent
+docker ps
+
+#Les containers qui s'exécutent et ceux à l'arrêt
+docker ps -a
+
+#Les ID des containers
+docker ps -q
+docker ps -aq
+ 
+#afficher uniquement le dernier container crée l=latest
+docker ps -l
+docker ps --last=3
+
+#Filter la sortie
+docker ps -a --filter name=web
+docker ps -a --filter status=exited
+docker ps -a --filter exited=137
+
+#Modifier l'apparence de la sortie standard en sélectionnnant les colonnes
+docker ps -a --format="{{.Name}}:{{.Status}}"
+
+#Inspecter/Visualiser les propriéts d'un container
+--------------------------------------------------
+docker container inspect host2 / id) | more 
+docker inspect host2 | more 
+docker container inspect --format='{{ .State.Status}}' web03
+docker inspect -f '{{ .State.Status}}' web03
+docker inspect --format "{{ .Name }}" efc940
+#extraire un tableau en entier en utilisant le mot clé json et en donnant le nom du tableau
+docker inspect --format='{{ json .State}}' web03 | jq
+
+
+
+#Pulicaton du port
+------------------
+Allocaton static : -p GOST_PORT:CONATAINER_PORT
+Allocation dynamique : -P (32758 - 61000)
+
+#Bind mount : monter dans le filesysteme du container un fichier ou dossier de la machine hôte
+------------
+docker container run  -v HOST_PATH:CONTAINER_PATH
+docker container run  -mount type=bind, src=HOST_PATH,dst=CONTAINER_PATH
+
+docker container run  -v $PWD/wwww:/usr/share/nginx/html:ro  -d -p 8080:80 nginx:1.14-alpine
+(avec :ro = read only)
+
+
+#Limitation des resources
+-------------------------
+docker container run --memory 32m estesp/hogit
+docker container run --cpus 0.5 -ti --rm progrium/stress --cpu 4 => 50 % d'un coeur
+docker container run --cpus 2 -ti --rm progrium/stress --cpu 4 => utilisation 2 cores 
+
+#Droits dans un container
+-------------------------
+bonne pratique, utiliser un utilisateur non root pour lancer un container
+acev option --user au lancement
+
+docker container run -d mongo:4.4
+ps aux (=> voir les process)
+
+#Options utiles
+----------------
+--name : donner unnom
+--rm : supprimer le container quand il est stoppé
+--restart=on-failure => daimon relance un container qui s'est arrêté
+
+#Utilisation des Alias
+----------------------
+alias dls='docker container ls'
+alias dlsa='docker container ls -a'
+alias dstopall='docker container stop $(docker container ls -q)'

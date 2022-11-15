@@ -1,0 +1,36 @@
+Volume:
+Découpler les données du cycle de vie d'un container
+Création d'un volume:
+- instruction VOLUME dans dockerFlle
+- option -v --mount à la création d'un container
+
+Usage:
+-persistance d'une base de données
+-persistance des logs en dehors du container
+
+docker volume --help
+docker container run -v CONTAINER_PATH IMAGE
+
+docker volume create -name db-data
+docker volume ls
+docker volume inspect ds-data
+docker rm -f id
+
+docker container run -d --name db -v db-data:/data/db mongo:4.0
+le voume db-data(depuis le host) sera utilisé pour persister les données présentes dans /data/db du container
+
+
+Driver de volume:
+permettent de persister les donées sur différents type de stockage
+
+Pluggin:
+docker plugin install vieux/sshfs
+
+
+ssh USER@HOST mkdir /tmp/data
+docker volume create -d(nom du driver) vieux/sshfs -o sshcmd USER@HOST:/tmp/data -o password=PASSWORD data 
+docker volume ls
+docker run -ti -v data:/data alpine
+touch /data/test
+
+ssh USER@HOST ls /tmp/data > présente du fichier test créer dans le container

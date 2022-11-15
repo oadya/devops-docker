@@ -1,0 +1,102 @@
+Image : un teemplate pour instancier des container ,  composée d ou plusieurs layers
+code de l'application
+dépendance
+env d'exécution (jre,..)
+binaires et librairies sysème( os ubuntu,..)
+
+les layers stockées dans /var/lib/docker
+
+
+#Construire une image
+docker image build [OPTION] PATH | URL
+docker image build -t app:1.0 .
+
+Options :
+-f : nom du dockerFile / chemin à spécifier pour le docker fil
+-tag/-t : nom de l'image :ex registry/user/repository:tag
+--label : ajouter des métadonnées à une image
+
+Nommage: USER/IMAGE:VERSION
+
+Commande de base:
+-----------------
+docker image --help
+docker build -t masociete/monappli:1.0 .(le . le repertoire courant ou se trouve le DockerFile)
+docker image ls node > lister les image ui ont un nom node
+docker image ls -a
+docker image ls --filter dangling=true
+docker image insect alpine
+docker history alpine
+docker image history ubuntu
+docker image rm ubuntu
+docker image rm $(docker image ls -q)
+
+#expoter une image et creer une image à partir d'un tar
+docker save -o alpine.tar alpine
+docker load < alpine.tar
+
+Ou sont les images:
+Tout se passe dans le répertoire /var/lib/docker, c'est le répertoire au Docker gère l'ensemble des primitives (containers, images, volumes, networks, ...). 
+
+#Crée une image dans tag
+docker build aline
+
+#taguer une image
+docker tag [ID IMAGE / NOM IMAGE] masociete/alpine:1.0
+
+#Chang de tag une image
+docker tag masociete/alpine:1.0 masociete/alpine:latest
+
+#Se connecter 
+docker login [USER / PASSWORD]
+
+#Push
+docker image push masociete/alpine:1.0  USER/IMAGE:VERSION
+
+#Pull
+docker pull masociete/alpine
+
+
+#Suppresion image
+docker rmi masociete/alpine
+docker rmi masociete/alpine:1.0
+docker image rm $(docker image ls -q)
+
+#Inspecter/Visualiser les proprités d'une image
+--------------------------------------------------
+docker image inspect host2 / id) | more 
+docker image inspect -f '{{ .Architechture }}' alpine
+docker image inspect --format '{{ .containerConfig.Cmd }}' mongo:3.2
+
+#Voir les images
+docker images
+
+#Voir les différentes couches d'une image
+docker history masociete/monappli:1.1
+
+#lancer un container a partir d'une image centos
+docker run -ti --name=contempo centos
+
+#créer une archive tar
+docker export -o moncentos.tar contempo
+
+#voir le tar
+docker tvf moncentos.tar 
+
+#compresser le tar
+gzip moncentos.tar
+
+#Transféfer le fichier sur une autre machine
+scp moncentos.tar.gz centos2 
+
+#Créer une image à partir d'une archive
+docker import moncentos.tar.gz masociete/moncentos:1.0 
+
+#Lancer un container à partir de cette image
+docker run -it masociete/moncentos:1.0 bash
+
+Gestion du Cache
+les éléments qui sont suceptibles d'être le plus souvent modifier soient positionnés le plus en bas posible dans le dockerFile 
+
+Multi Stage build
+Decoupage du build en plusieurs etape pour avoir ue image plus light

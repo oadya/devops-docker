@@ -1,0 +1,83 @@
+#DockerFile, est un ensemble d'instruction pour construire une image. La bonne pratique étant de créér un fichier par image ou par projet
+# Combiner les commandes avec " && " et " \ "(pour écrire une commande sur plusieurs ligne)
+
+#FROM :
+#Première instruction dans le DockerFile, qui défini qu'elle est la première couche de base pour construire l'image
+EX: FROM centos
+    FROM alpine
+    FROM scratch #pour démarrer à partir d'une image vièrge
+ 
+#RUN :
+#Spécifie une commande qui doit être exécutée à l'intérieur du container pendant la construction de l'image
+#elle permet d'installer des logiciels, des librairies
+#phase d'installation et compilation des dépendances
+RUN yum install -y wget
+RUN yum install -y zip  (format shell)
+RUN ["/bin/bash", "-c", "echo hello"] (exec)
+
+#LABEL : 
+#Permet de rajouter à l'image, l'éditeur, la personne qui maintinet le code,les informations concernant l'application, 
+#les systèmes sur lequels elle doit d'exécuter ou peut être déployée.
+#Peut être utilisé pour réaliser des filtraeges
+#EX :
+LABEL version="1.0"
+LABEL descriontion="Serveur XWeb Intranet"
+LABEL os="ubuntu"
+
+EXPOSE 27017
+Spécifier les port sur lequel l'application écoute
+
+On peux les redéfinir au lancement
+-p CONTAINER_PORT
+-p HOST_PORT/CONTAINER_PORT
+-P
+
+ENV :
+Instruction qui permet d'initiliser les variables d'environnement
+ENV JAVA_HOME /user/bin/java => utilsation ${JAVA_HOME}
+
+WORKDIR :
+C'est une instruction qui défini le dossier de travail dans le container. 
+Par défaut il est égal à /
+Positionnement du répertore de travail
+Les commandes qui l'utilise sont run, cmd, copy 
+
+WORKDIR /opt
+
+
+#ADD :
+#Permet de faire des copies du fichier à partir de la source (le build contexte, ou se trouve le Dockerfile) vers le container
+#Elle permet aussi d'extraire des archives à l'intéreir du container
+#On peut aussi utiliser des URL
+ADD archive.tar.gz /
+
+#COPY :
+#Permet de copier des fichiers à partir de la source du hôte vers le container
+#Copier la liste des dépendences
+#copier le code applicatif
+#Ne permet aussi d'extraire des archiives
+COPY fichier.conf /etc/
+
+#EXPOSE
+EXPOSE 80 : exposer le port http
+
+#HEALTHCHECK
+Vérifier l'état de santé de l'application
+
+#USER
+Utilisateur auquel appartient le processus du container
+
+VOLUME 
+VOLUME /data/db /data/conigdb
+
+#CMD :
+#Spécifie la commande par défaut qui va être exécuté lorque le container est crée
+#Elle n'existe qu'ne seule fois dans un DockerFile
+#Elle peut être remplacer si au moment de l'éxécution du container, on spécifie la commnde à la suite du nom du container
+CMD ["ping", "127.0.0.1", "-c", "30"]
+
+#ENTRYPOINT :
+#Spécifie le point d'entré du container, qui devrait être soit le binaire de votre application soit un script de démarrage de l'application
+#La bonne pratique est d'avoir cette instrction dans un dockerFile
+# Si ENTRYPOINT  et CMD existent alors CDM passe en tant qu'argument à ENTRYPOINT  
+ENTRYPOINT ["monappli-start-sh"]
